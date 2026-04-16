@@ -93,6 +93,19 @@ from models import get_model
 from trainer import Trainer
 ```
 
+### Multi-GPU (2x T4)
+
+```python
+trainer = Trainer(
+    model=model,
+    criterion=nn.CrossEntropyLoss(),
+    optimizer=optimizer,
+    use_data_parallel=True,  # wraps model in nn.DataParallel
+)
+```
+
+The flag is safe to leave on — if only 1 GPU is detected, it's silently ignored. State dicts are saved without the `module.` prefix, so checkpoints work identically on single and multi-GPU setups.
+
 ## API Reference
 
 ### `models.py`
@@ -124,6 +137,7 @@ Trainer(
     num_classes=4,                  # Must match model
     class_names=None,               # For figure labels
     use_amp=True,                   # Mixed precision on GPU
+    use_data_parallel=False,        # nn.DataParallel for multi-GPU (e.g. 2x T4)
     early_stopping_patience=10,     # Epochs without improvement
     gradient_clip_value=1.0,        # Max gradient norm
 )

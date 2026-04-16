@@ -57,6 +57,7 @@ class Trainer:
         num_classes: int = 4,
         class_names: Optional[List[str]] = None,
         use_amp: bool = True,
+        use_data_parallel: bool = False,
         early_stopping_patience: int = 10,
         gradient_clip_value: float = 1.0,
     ):
@@ -69,6 +70,15 @@ class Trainer:
             "cuda" if torch.cuda.is_available() else "cpu"
         )
         self.model.to(self.device)
+
+        # DataParallel — wrap only when explicitly enabled and 2+ GPUs exist
+        self.use_data_parallel = (
+            use_data_parallel
+            and self.device.type == "cuda"
+            and torch.cuda.device_count() > 1
+        )
+        if self.use_data_parallel:
+            self.model = nn.DataParallel(self.model)
 
         # Classification config
         self.num_classes = num_classes
@@ -109,6 +119,13 @@ class Trainer:
         self._last_labels: Optional[np.ndarray] = None
         self._last_preds: Optional[np.ndarray] = None
         self._last_probs: Optional[np.ndarray] = None
+
+    @property
+    def _raw_model(self) -> nn.Module:
+        """Unwrap DataParallel to access the underlying model."""
+        if isinstance(self.model, nn.DataParallel):
+            return self.model.module
+        return self.model
 
     # ──────────────────────────────────────────────────────────
     # Training loop — single epoch
@@ -275,8 +292,12 @@ class Trainer:
         """
 
         if verbose:
+            gpu_info = ""
+            if self.use_data_parallel:
+                n = torch.cuda.device_count()
+                gpu_info = f" | DataParallel: {n}x {torch.cuda.get_device_name(0)}"
             print(f"{'='*70}")
-            print(f"  Training on {self.device} | AMP: {self.use_amp}")
+            print(f"  Training on {self.device} | AMP: {self.use_amp}{gpu_info}")
             print(f"  Classes: {self.class_names}")
             print(f"  Patience: {self.early_stopping_patience}")
             print(f"{'='*70}\n")
@@ -320,7 +341,7 @@ class Trainer:
             if val_loss < self.best_val_loss:
                 self.best_val_loss = val_loss
                 self.best_epoch = epoch
-                self.best_model_state = copy.deepcopy(self.model.state_dict())
+                self.best_model_state = copy.deepcopy(self._raw_model.state_dict())
                 self.patience_counter = 0
                 marker = " ★"
             else:
@@ -349,7 +370,7 @@ class Trainer:
 
         # Restore best model
         if self.best_model_state is not None:
-            self.model.load_state_dict(self.best_model_state)
+            self._raw_model.load_state_dict(self.best_model_state)
             if verbose:
                 print(f"\n✓ Restored best model from epoch {self.best_epoch}.")
 

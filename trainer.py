@@ -669,6 +669,58 @@ class Trainer:
     # ──────────────────────────────────────────────────────────
     # Utilities
     # ──────────────────────────────────────────────────────────
+    def save_model(self, path: str, include_history: bool = False) -> None:
+        """
+        Save the best model checkpoint to disk.
+
+        Parameters
+        ----------
+        path : str
+            File path for the checkpoint (e.g. "best_model.pth").
+        include_history : bool
+            If True, also saves training history and class names alongside
+            the model weights.
+        """
+        state = self.best_model_state if self.best_model_state is not None else self._raw_model.state_dict()
+
+        checkpoint = {"model_state_dict": state}
+        if include_history:
+            checkpoint["history"] = self.history
+            checkpoint["class_names"] = self.class_names
+            checkpoint["best_epoch"] = self.best_epoch
+            checkpoint["best_val_loss"] = self.best_val_loss
+
+        torch.save(checkpoint, path)
+        print(f"✓ Model saved to {path}")
+
+    def load_model(self, path: str) -> None:
+        """
+        Load a model checkpoint from disk.
+
+        Parameters
+        ----------
+        path : str
+            Path to a checkpoint saved by :meth:`save_model`.
+        """
+        checkpoint = torch.load(path, map_location=self.device, weights_only=False)
+
+        if "model_state_dict" in checkpoint:
+            self._raw_model.load_state_dict(checkpoint["model_state_dict"])
+            if "history" in checkpoint:
+                self.history = checkpoint["history"]
+            if "class_names" in checkpoint:
+                self.class_names = checkpoint["class_names"]
+            if "best_epoch" in checkpoint:
+                self.best_epoch = checkpoint["best_epoch"]
+            if "best_val_loss" in checkpoint:
+                self.best_val_loss = checkpoint["best_val_loss"]
+        else:
+            # Support loading a plain state_dict
+            self._raw_model.load_state_dict(checkpoint)
+
+        self.model.to(self.device)
+        print(f"✓ Model loaded from {path}")
+
     def get_classification_report(self) -> str:
         """Return sklearn's classification report as a formatted string."""
         if self._last_labels is None:

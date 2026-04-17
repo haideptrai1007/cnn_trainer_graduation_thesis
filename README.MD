@@ -80,6 +80,10 @@ history = trainer.fit(train_loader, val_loader, epochs=50)
 # Evaluate
 trainer.summary()
 trainer.plot_all(save_dir="./figures")
+
+# Save / Load
+trainer.save_model("best_model.pth", include_history=True)
+trainer.load_model("best_model.pth")
 ```
 
 ## Kaggle Usage
@@ -161,6 +165,13 @@ Trainer(
 | `plot_per_class_metrics()` | Precision / Recall / F1 bars |
 | `plot_metric_summary()` | Global metrics table |
 | `plot_all(save_dir)` | All figures at once |
+
+**Checkpointing:**
+
+| Method | Description |
+|---|---|
+| `save_model(path, include_history=False)` | Save best model weights (optionally with history) |
+| `load_model(path)` | Load a saved checkpoint |
 
 **Utilities:**
 

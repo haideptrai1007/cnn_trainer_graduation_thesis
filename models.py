@@ -46,7 +46,9 @@ def edgenext_xxs(num_classes: int = 4, in_chans: int = 1, pretrained: bool = Fal
         pretrained=pretrained,
         in_chans=in_chans,
         num_classes=num_classes,
-        drop_rate=0.2,
+        drop_rate=0.1,
+        drop_path_rate=0.1,
+        attn_drop_rate=0.0,
         **kw,
     )
 

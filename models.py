@@ -46,8 +46,10 @@ def edgenext_xxs(num_classes: int = 4, in_chans: int = 1, pretrained: bool = Fal
         pretrained=pretrained,
         in_chans=in_chans,
         num_classes=num_classes,
+        drop_rate=0.2,
         **kw,
     )
+
 
 
 @register("mobileone_s0")

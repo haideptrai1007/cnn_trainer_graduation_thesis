@@ -29,7 +29,7 @@ from sklearn.metrics import (
     roc_auc_score,
     roc_curve,
 )
-from torch.cuda.amp import GradScaler, autocast
+from torch.amp import GradScaler, autocast
 
 
 # ──────────────────────────────────────────────────────────────
@@ -86,7 +86,7 @@ class Trainer:
 
         # Training config
         self.use_amp = use_amp and self.device.type == "cuda"
-        self.scaler = GradScaler(enabled=self.use_amp)
+        self.scaler = GradScaler("cuda", enabled=self.use_amp)
         self.early_stopping_patience = early_stopping_patience
         self.gradient_clip_value = gradient_clip_value
 
@@ -142,7 +142,7 @@ class Trainer:
 
             self.optimizer.zero_grad(set_to_none=True)
 
-            with autocast(enabled=self.use_amp):
+            with autocast("cuda", enabled=self.use_amp):
                 outputs = self.model(inputs)
                 loss = self.criterion(outputs, targets)
 
@@ -186,7 +186,7 @@ class Trainer:
             inputs = inputs.to(self.device, non_blocking=True)
             targets = targets.to(self.device, non_blocking=True)
 
-            with autocast(enabled=self.use_amp):
+            with autocast("cuda", enabled=self.use_amp):
                 outputs = self.model(inputs)
                 loss = self.criterion(outputs, targets)
 

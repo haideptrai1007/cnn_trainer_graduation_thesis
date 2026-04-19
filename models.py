@@ -64,8 +64,8 @@ def mobileone_s0(num_classes: int = 4, in_chans: int = 1, pretrained: bool = Fal
         width_factor=0.5,
         in_chans=in_chans,
         num_classes=num_classes,
-        drop_rate=kw.pop("drop_rate", 0.3),
-        drop_path_rate=kw.pop("drop_path_rate", 0.2),
+        drop_rate=kw.pop("drop_rate", 0.5),
+        drop_path_rate=kw.pop("drop_path_rate", 0.1),
         **kw,
     )
 
@@ -83,7 +83,7 @@ def ghostnetv3(num_classes: int = 4, in_chans: int = 1, pretrained: bool = False
         pretrained=pretrained,
         in_chans=in_chans,
         num_classes=num_classes,
-        drop_rate=kw.pop("drop_rate", 0.4),
+        drop_rate=kw.pop("drop_rate", 0.5),
         **kw,
     )
 
@@ -101,8 +101,8 @@ def mobilenetv4(num_classes: int = 4, in_chans: int = 1, pretrained: bool = Fals
         pretrained=pretrained,
         in_chans=in_chans,
         num_classes=num_classes,
-        drop_rate=kw.pop("drop_rate", 0.3),
-        drop_path_rate=kw.pop("drop_path_rate", 0.2),
+        drop_rate=kw.pop("drop_rate", 0.5),
+        drop_path_rate=kw.pop("drop_path_rate", 0.1),
         **kw,
     )
 

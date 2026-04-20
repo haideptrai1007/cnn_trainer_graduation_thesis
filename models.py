@@ -71,6 +71,25 @@ def mobileone_s0(num_classes: int = 4, in_chans: int = 1, pretrained: bool = Fal
     )
 
 
+@register("mobileone_s1")
+def mobileone_s1(num_classes: int = 4, in_chans: int = 1, pretrained: bool = False, **kw) -> nn.Module:
+    """
+    MobileOne S1 (width=0.5)  (~1.2M params est.)
+
+    Single-branch reparam variant — less LR-sensitive than S0
+    (which has 4 over-parameterization branches).
+    """
+    return timm.create_model(
+        "mobileone_s1",
+        pretrained=pretrained,
+        width_factor=0.5,
+        in_chans=in_chans,
+        num_classes=num_classes,
+        drop_path_rate=kw.pop("drop_path_rate", 0.1),
+        **kw,
+    )
+
+
 @register("ghostnetv3")
 def ghostnetv3(num_classes: int = 4, in_chans: int = 1, pretrained: bool = False, **kw) -> nn.Module:
     """
@@ -84,7 +103,6 @@ def ghostnetv3(num_classes: int = 4, in_chans: int = 1, pretrained: bool = False
         pretrained=pretrained,
         in_chans=in_chans,
         num_classes=num_classes,
-        drop_rate=kw.pop("drop_rate", 0.4),
         **kw,
     )
 
@@ -102,7 +120,6 @@ def mobilenetv4(num_classes: int = 4, in_chans: int = 1, pretrained: bool = Fals
         pretrained=pretrained,
         in_chans=in_chans,
         num_classes=num_classes,
-        drop_rate=kw.pop("drop_rate", 0.3),
         drop_path_rate=kw.pop("drop_path_rate", 0.1),
         **kw,
     )
@@ -121,8 +138,7 @@ def tinynet_d(num_classes: int = 4, in_chans: int = 1, pretrained: bool = False,
         pretrained=pretrained,
         in_chans=in_chans,
         num_classes=num_classes,
-        drop_rate=kw.pop("drop_rate", 0.2),
-        drop_path_rate=kw.pop("drop_path_rate", 0.1),
+        drop_path_rate=kw.pop("drop_path_rate", 0.2),
         **kw,
     )
 
@@ -138,7 +154,8 @@ def get_model(name: str, **kw) -> nn.Module:
     Parameters
     ----------
     name : str
-        One of: edgenext_xxs, mobileone_s0, ghostnetv3, mobilenetv4, tinynet_d
+        One of: edgenext_xxs, mobileone_s0, mobileone_s1, ghostnetv3,
+        mobilenetv4, tinynet_d
     **kw :
         Forwarded to the factory (num_classes, in_chans, pretrained, etc.)
 

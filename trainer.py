@@ -361,8 +361,8 @@ class Trainer:
                     f"{epoch_time:.1f}s{marker}"
                 )
 
-            # --- Early stopping ---
-            if self.patience_counter >= self.early_stopping_patience:
+            # --- Early stopping (disabled if patience <= 0) ---
+            if self.early_stopping_patience > 0 and self.patience_counter >= self.early_stopping_patience:
                 if verbose:
                     print(f"\n✗ Early stopping at epoch {epoch}.")
                     print(f"  Best epoch: {self.best_epoch} (val_loss={self.best_val_loss:.4f})")

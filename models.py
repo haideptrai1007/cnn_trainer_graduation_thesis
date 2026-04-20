@@ -108,6 +108,25 @@ def mobilenetv4(num_classes: int = 4, in_chans: int = 1, pretrained: bool = Fals
     )
 
 
+@register("tinynet_d")
+def tinynet_d(num_classes: int = 4, in_chans: int = 1, pretrained: bool = False, **kw) -> nn.Module:
+    """
+    TinyNet-D  (~2.34M params)
+
+    EfficientNet variant with joint depth/width/resolution scaling.
+    Native input 152×152 — closest natural fit for 128×128.
+    """
+    return timm.create_model(
+        "tinynet_d",
+        pretrained=pretrained,
+        in_chans=in_chans,
+        num_classes=num_classes,
+        drop_rate=kw.pop("drop_rate", 0.2),
+        drop_path_rate=kw.pop("drop_path_rate", 0.1),
+        **kw,
+    )
+
+
 # ──────────────────────────────────────────────────────────────
 # Public API
 # ──────────────────────────────────────────────────────────────
@@ -119,7 +138,7 @@ def get_model(name: str, **kw) -> nn.Module:
     Parameters
     ----------
     name : str
-        One of: edgenext_xxs, mobileone_s0, ghostnetv3, mobilenetv4
+        One of: edgenext_xxs, mobileone_s0, ghostnetv3, mobilenetv4, tinynet_d
     **kw :
         Forwarded to the factory (num_classes, in_chans, pretrained, etc.)
 
